@@ -1,22 +1,17 @@
+require_relative 'hand'
+
 class Player
-  attr_reader :cards, :name, :points
+  attr_reader :cards, :name, :hand
   attr_accessor :bank
 
   def initialize(name = 'Player')
     @name = name
-    @cards = []
-  end
-
-  def cards_count
-    @cards.count
-  end
-
-  def take_card(card)
-    @cards << card
+    @bank = Bank.new(self, 100)
+    @hand = Hand.new(self)
   end
 
   def show_cards
-    @cards.map(&:name).join('  ')
+    @hand.cards.map(&:name).join('  ')
   end
 
   def betting(amount, game_bank)
@@ -24,22 +19,7 @@ class Player
     game_bank.add(amount)
   end
 
-  def count_points
-    points_init = @cards.map(&:point).inject(:+)
-    @points = ace_point_change(points_init)
-  end
-
-  protected
-
-  def ace_point_change(points_init)
-    if ace_count == 1 && points_init <= 21
-      points_init
-    else
-      points_init -= 10 * ace_count
-    end
-  end
-
-  def ace_count
-    @cards.select { |card| card.rank == 'Ace' }.count
+  def points
+    @hand.count_points
   end
 end
