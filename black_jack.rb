@@ -5,7 +5,7 @@ require_relative 'user'
 require_relative 'bank'
 
 class BlackJack
-  attr_reader :stop, :players, :winner
+  attr_reader :stop, :players, :winner, :bet_amount
 
   def initialize
     @bank = Bank.new(self)
@@ -41,7 +41,7 @@ class BlackJack
   def perform_user_action(action)
     @stop = true if action == 'Открыть карты'
     return if @stop
-    action == 'Пропустить' ? skip_turn(@user) : take_card(@user)
+    take_card(@user) unless action == 'Пропустить'
     check_hand_cards
   end
 
@@ -49,16 +49,15 @@ class BlackJack
     if @dealer.points < 14 && !@dealer.hand.limit_reached?
       take_card(@dealer)
     elsif @dealer.hand.limit_reached? || @dealer.points > 17
-      skip_turn(@dealer)
+      'skip'
     else
-      [ skip_turn(@dealer), take_card(@dealer) ].sample
+      [ 'skip', take_card(@dealer) ].sample
     end
     check_hand_cards
   end
 
-  def define_winner
-    @winner = define_winner!
-    @winner.nil? ? dead_heat : reward_winner(winner)
+  def stop!
+    define_winner
   end
 
   private
@@ -79,21 +78,20 @@ class BlackJack
   def betting
     @players.each do |player|
       player.betting(@bet_amount, @bank)
-      puts "Ставка #{player.name}: $#{@bet_amount}"
     end
   end
 
   def take_card(player)
     player.hand.add_card(@deck.distribute)
-    puts "    #{player.name} добавил карту."
-  end
-
-  def skip_turn(player)
-    puts "    #{player.name} пропустил ход."
   end
 
   def check_hand_cards
     @stop = true if @dealer.hand.limit_reached? && @user.hand.limit_reached?
+  end
+
+  def define_winner
+    @winner = define_winner!
+    @winner.nil? ? dead_heat : reward_winner(winner)
   end
 
   def define_winner!
@@ -105,7 +103,7 @@ class BlackJack
   def dead_heat
     @players.each do |player|
       player.bank.add(@bet_amount)
-      @bank.reduce(@bet_amount)
+      @bank.deduct(@bet_amount)
     end
   end
 

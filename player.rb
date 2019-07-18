@@ -10,10 +10,6 @@ class Player
     @hand = Hand.new(self)
   end
 
-  def show_cards
-    @hand.cards.map(&:name).join('  ')
-  end
-
   def betting(amount, game_bank)
     @bank.deduct(amount)
     game_bank.add(amount)
