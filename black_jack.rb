@@ -3,27 +3,20 @@ require_relative 'deck'
 require_relative 'dealer'
 require_relative 'user'
 require_relative 'bank'
+require_relative 'terminal_interface'
 
 class BlackJack
-  attr_reader :stop, :players, :winner, :bet_amount
+  attr_reader :stop, :players, :dealer, :user, :winner, :bet_amount, :interface
 
-  def initialize
+  def initialize(interface)
     @bank = Bank.new(self)
     @players = []
     @bet_amount = 10
-    @stop = false
-  end
-
-  def create_user(user_name)
-    @user = User.new(user_name)
-    @players << @user
-    @user
-  end
-
-  def create_dealer
-    @dealer = Dealer.new('Dealer')
-    @players << @dealer
-    @dealer
+    @interface = interface
+    @interface.game = self
+    @interface.greeting
+    create_user
+    create_dealer
   end
 
   def start
@@ -31,6 +24,23 @@ class BlackJack
     betting
     create_deck
     card_distribution
+    @interface.notify_starting
+    @interface.show_cards
+    game_process
+    stop!
+  end
+
+  def game_process
+    loop do
+      break if @stop
+      @interface.turn_to(@user)
+      perform_user_action(@interface.get_user_action)
+      @interface.show_cards
+      break if @stop
+      @interface.turn_to(@user)
+      dealer_action
+      @interface.show_cards
+    end
   end
 
   def user_available_actions
@@ -58,9 +68,21 @@ class BlackJack
 
   def stop!
     define_winner
+    @interface.stop
+    start_again?(@interface.start_again?)
   end
 
   private
+
+  def create_user
+    @user = User.new(@interface.get_user_name)
+    @players << @user
+  end
+
+  def create_dealer
+    @dealer = Dealer.new('Dealer')
+    @players << @dealer
+  end
 
   def create_deck
     @deck = Deck.new
@@ -119,5 +141,9 @@ class BlackJack
   def clear_player_cards
     @user.hand.cards.clear
     @dealer.hand.cards.clear
+  end
+
+  def start_again?(answer)
+    answer == 1 ? start : @interface.game_over
   end
 end
