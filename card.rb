@@ -1,6 +1,17 @@
 class Card
   attr_reader :name, :rank
 
+  RANKS = %w[2 3 4 5 6 7 8 9 10 Jack Queen King Ace].freeze
+  SUITS = %w[♣ ♥ ♠ ♦].freeze
+
+  def self.get_ranks
+    RANKS
+  end
+
+  def self.get_suits
+    SUITS
+  end
+
   def initialize(rank, suit)
     @rank = rank
     @name = rank.to_s + suit
