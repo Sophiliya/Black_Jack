@@ -1,9 +1,8 @@
 require_relative 'player'
 
 class User < Player
+  
+  class Dealer < Player
 
-end
-
-class User::Dealer < Player
-
+  end
 end
