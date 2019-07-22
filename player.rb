@@ -19,3 +19,8 @@ class Player
     @hand.count_points
   end
 end
+
+class Player::User < Player
+end
+class Player::Dealer < Player
+end

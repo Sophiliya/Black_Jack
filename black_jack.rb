@@ -1,6 +1,6 @@
 require_relative 'card'
 require_relative 'deck'
-require_relative 'user'
+require_relative 'player'
 require_relative 'bank'
 require_relative 'terminal_interface'
 
@@ -74,12 +74,12 @@ class BlackJack
   private
 
   def create_user
-    @user = User.new(@interface.get_user_name)
+    @user = Player::User.new(@interface.get_user_name)
     @players << @user
   end
 
   def create_dealer
-    @dealer = User::Dealer.new('Dealer')
+    @dealer = Player::Dealer.new('Dealer')
     @players << @dealer
   end
 
