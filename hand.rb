@@ -20,11 +20,11 @@ class Hand
   end
 
   def cards_enough?
-    cards_count == 2 ? true : false 
+    cards_count == 2
   end
 
   def limit_reached?
-    cards_count == 3 ? true : false
+    cards_count == 3
   end
 
   private
